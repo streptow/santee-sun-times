@@ -1,0 +1,53 @@
+# santee-sun-times
+For ARCGIS website
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Santee Sunrise & Sunset (Today)</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial; margin:0; padding:12px;}
+    .box{display:inline-block;padding:8px 12px;border-radius:8px;background:#f7f7f7;border:1px solid #e0e0e0;}
+    .label{font-weight:600;margin-right:6px;}
+    .small{font-size:0.9rem;color:#555;}
+  </style>
+</head>
+<body>
+  <div class="box" id="sun-box" aria-live="polite">
+    <div><span class="label">Sunrise:</span><span id="sunrise">—</span></div>
+    <div><span class="label">Sunset:</span><span id="sunset">—</span></div>
+    <div class="small" id="note">Location: Santee Coastal Reserve</div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
+  <script>
+    var LAT = 33.0453;
+    var LON = -80.5479;
+    var TZ = 'America/New_York';
+
+    var today = new Date();
+    var times = SunCalc.getTimes(today, LAT, LON);
+
+    function formatInTZ(dateObj, timeZone) {
+      try {
+        var fmt = new Intl.DateTimeFormat(undefined, {
+          hour: 'numeric', minute: '2-digit',
+          hour12: true,
+          timeZone: timeZone
+        });
+        return fmt.format(dateObj);
+      } catch(e) {
+        var h = dateObj.getHours();
+        var m = String(dateObj.getMinutes()).padStart(2,'0');
+        var ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12; if (h === 0) h = 12;
+        return h + ':' + m + ' ' + ampm;
+      }
+    }
+
+    document.getElementById('sunrise').textContent = formatInTZ(times.sunrise, TZ);
+    document.getElementById('sunset').textContent  = formatInTZ(times.sunset, TZ);
+  </script>
+</body>
+</html>
