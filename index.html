@@ -1,42 +1,48 @@
-# santee-sun-times
-For ARCGIS website
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Santee Sunrise & Sunset (Today)</title>
+  <title>Santee Open Hours</title>
   <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial; margin:0; padding:12px;}
-    .box{display:inline-block;padding:8px 12px;border-radius:8px;background:#f7f7f7;border:1px solid #e0e0e0;}
-    .label{font-weight:600;margin-right:6px;}
-    .small{font-size:0.9rem;color:#555;}
+    body {
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      margin:0; padding:12px;
+      font-size:16px;
+    }
+    .open-box {
+      display:inline-block;
+      padding:8px 12px;
+      border-radius:8px;
+      background:#f7f7f7;
+      border:1px solid #e0e0e0;
+    }
   </style>
 </head>
 <body>
-  <div class="box" id="sun-box" aria-live="polite">
-    <div><span class="label">Sunrise:</span><span id="sunrise">—</span></div>
-    <div><span class="label">Sunset:</span><span id="sunset">—</span></div>
-    <div class="small" id="note">Location: Santee Coastal Reserve</div>
-  </div>
+  <div class="open-box" id="open-hours">Loading...</div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
   <script>
+    // Coordinates for Santee Coastal Reserve
     var LAT = 33.1539;
     var LON = 79.3665;
-    var TZ = 'America/New_York';
+    var TZ  = 'America/New_York';
 
     var today = new Date();
     var times = SunCalc.getTimes(today, LAT, LON);
 
+    // Add/subtract 30 minutes
+    var openTime = new Date(times.sunrise.getTime() - 30*60*1000);
+    var closeTime = new Date(times.sunset.getTime() + 30*60*1000);
+
     function formatInTZ(dateObj, timeZone) {
       try {
-        var fmt = new Intl.DateTimeFormat(undefined, {
+        return new Intl.DateTimeFormat(undefined, {
           hour: 'numeric', minute: '2-digit',
           hour12: true,
           timeZone: timeZone
-        });
-        return fmt.format(dateObj);
+        }).format(dateObj);
       } catch(e) {
         var h = dateObj.getHours();
         var m = String(dateObj.getMinutes()).padStart(2,'0');
@@ -46,8 +52,8 @@ For ARCGIS website
       }
     }
 
-    document.getElementById('sunrise').textContent = formatInTZ(times.sunrise, TZ);
-    document.getElementById('sunset').textContent  = formatInTZ(times.sunset, TZ);
+    document.getElementById('open-hours').textContent =
+      "Open: " + formatInTZ(openTime, TZ) + " → " + formatInTZ(closeTime, TZ);
   </script>
 </body>
 </html>
